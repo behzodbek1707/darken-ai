@@ -10,6 +10,13 @@ const rl = readLine.createInterface({
 console.log("⚫ Darken is online...")
 console.log("Type a command:")
 
-rl.on("line", (input: string)=>{
-    routeCommand(input)
+rl.on("line", async (input: string)=>{
+    const trimmed = input.trim().toLowerCase();
+
+    if (trimmed === "exit" || trimmed === "quit") {
+        console.log("⚫ Darken: Shutting down...");
+        rl.close();
+        process.exit(0);
+    }
+    await routeCommand(input.trim())
 })

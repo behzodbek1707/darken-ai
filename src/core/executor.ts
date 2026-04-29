@@ -1,41 +1,47 @@
 import { launchApp } from "../system/launcher.js";
 import { addApp, removeApp, setLast } from "./memory.js";
 import { exec } from "child_process";
+import { logCommand } from "./logger.js";
 
-export function execute(action: string, target: string){
+const killMap: Record<string, string> = {
+    chrome: "/opt/google/chrome/chrome",
+    vscode: "/usr/share/code/code",
+    firefox: "firefox",
+    telegram: "telegram-desktop",
+};
 
-    if(action === "open"){
-        console.log(`⚫ Darken: Opening ${target}`)
+export function execute(action: string, target: string) {
 
-        const pid = launchApp(target)
-
-        setLast({ action, target })
-
-        if (pid) addApp(target, pid)
-
-        return
+    if (action === "open") {
+        console.log(`⚫ Darken: Opening ${target}`);
+        const pid = launchApp(target);
+        setLast({ action, target });
+        logCommand(action, target);
+        if (pid) addApp(target, pid);
+        return;
     }
 
     if (action === "close") {
-        console.log(`⚫ Darken: Closing ${target}`)
+        console.log(`⚫ Darken: Closing ${target}`);
 
-        const nameMap: Record<string, string> = {
-            vscode: "code",
-            firefox: "firefox",
-            chrome: "google-chrome",
-            telegram: "telegram-desktop"
-        }
+        const pattern = killMap[target] || target;
 
-        const processName = nameMap[target] || target
-
-        exec(`pkill ${processName}`, (err) => {
-            if (err) {
-                console.log(`⚫ Darken: ${target} is not running`)
-            } else {
-                console.log(`⚫ Darken: Closed ${target}`)
-                removeApp(target)
+        exec(`pgrep -f "${pattern}"`, (checkErr) => {
+            if (checkErr) {
+                console.log(`⚫ Darken: ${target} is not running`);
+                return;
             }
-        })
-        setLast({ action, target })
+
+            exec(`pkill -f "${pattern}"`, () => {
+                console.log(`⚫ Darken: Closed ${target}`);
+                logCommand(action, target);
+                removeApp(target);
+            });
+        });
+
+        setLast({ action, target });
+        return;
     }
+
+    console.log(`⚫ Darken: Unknown action "${action}"`);
 }

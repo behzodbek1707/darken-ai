@@ -22,3 +22,7 @@ export function setLast(cmd: { action: string, target: string }) {
 export function getLast() {
     return lastCommand
 }
+
+export function getActiveApps(): string[] {
+    return Object.keys(activeApps);
+}

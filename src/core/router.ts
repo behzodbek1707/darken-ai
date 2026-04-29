@@ -1,13 +1,41 @@
 import { resolveAction } from "./resolver.js"
 import { resolveContext } from "./context.js"
 import { execute } from "./executor.js"
+import { askBrain } from "./brain.js"
+import { getHistory } from "./logger.js"
+import { getActiveApps } from "./memory.js"
 
 type Command = {
     action: string | null
     target: string | null
 }
 
-export function routeCommand(input: string) {
+export async function routeCommand(input: string) {
+    const trimmed = input.toLowerCase().trim()
+
+    if (trimmed.includes("what did i do") || trimmed.includes("history")) {
+        const entries = getHistory(5)
+        if (entries.length === 0) {
+            console.log("⚫ Darken: No history yet.")
+        } else {
+            console.log("⚫ Darken: Recent commands:")
+            entries.forEach(e => {
+                const time = new Date(e.timestamp).toLocaleTimeString()
+                console.log(`   [${time}] ${e.action} ${e.target}`)
+            })
+        }
+        return
+    }
+
+    if (trimmed.includes("what's open") || trimmed.includes("what is open")) {
+        const apps = getActiveApps()
+        if (apps.length === 0) {
+            console.log("⚫ Darken: No apps tracked as open.")
+        } else {
+            console.log(`⚫ Darken: Open apps → ${apps.join(", ")}`)
+        }
+        return
+    }
 
     let result: Command | null = resolveAction(input)
 
@@ -29,6 +57,16 @@ export function routeCommand(input: string) {
                 : (context.target ?? result?.target ?? null)
 
         result = { action, target }
+    }
+
+    if (!result || !result.action || !result.target) {
+        console.log("⚫ Darken: Thinking...")
+        try {
+            result = await askBrain(input)
+        } catch (err) {
+            console.log("⚫ Darken: Brain is unavailable right now.")
+            return
+        }
     }
 
     if (!result || !result.action || !result.target) {
