@@ -10,7 +10,41 @@ type Command = {
     target: string | null
 }
 
-export async function routeCommand(input: string) {
+const COMMAND_SPLITS = ["and", "then", "also", "after that"]
+
+function splitCommands(input: string): string[] {
+    let parts = [input]
+
+    for (const splitter of COMMAND_SPLITS) {
+        parts = parts.flatMap(p =>
+            p.toLowerCase().includes(` ${splitter} `)
+                ? p.split(new RegExp(` ${splitter} `, "i"))
+                : [p]
+        )
+    }
+
+    parts = parts.flatMap(p => p.split(/[.!?]+/))
+
+    return parts
+        .map(p => p.trim())
+        .filter(p => p.length > 0)
+}
+
+export async function routeCommand(input: string): Promise<void> {
+    const commands = splitCommands(input)
+
+    if (commands.length > 1) {
+        for (const cmd of commands) {
+            await routeSingle(cmd)
+            await new Promise(res => setTimeout(res, 800))
+        }
+        return
+    }
+
+    await routeSingle(input)
+}
+
+async function routeSingle(input: string): Promise<void> {
     const trimmed = input.toLowerCase().trim()
 
     if (trimmed.includes("what did i do") || trimmed.includes("history")) {
@@ -74,5 +108,5 @@ export async function routeCommand(input: string) {
         return
     }
 
-    execute(result.action, result.target)
+    await execute(result.action, result.target)
 }
