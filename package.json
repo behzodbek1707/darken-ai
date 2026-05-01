@@ -1,15 +1,21 @@
 {
-    "name": "darken-ai",
-    "version": "1.0.0",
-    "type": "module",
-    "scripts": {
-        "dev": "node --loader ts-node/esm src/index.ts",
-        "voice": "node --loader ts-node/esm src/index.ts --voice"
-    },
-    "dependencies": {
-        "@types/node": "^25.6.0",
-        "dotenv": "^16.0.0",
-        "ts-node": "^10.9.2",
-        "typescript": "^6.0.3"
-    }
+  "name": "darken-ai",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/ui/main.js",
+  "scripts": {
+    "dev": "node --loader ts-node/esm src/index.ts",
+    "voice": "node --loader ts-node/esm src/index.ts --voice",
+    "ui": "tsc && tsc -p tsconfig.preload.json && npm run copy-renderer && electron .",
+    "copy-renderer": "rm -rf dist/ui/renderer && cp -r src/ui/renderer dist/ui/renderer && rm -rf dist/assets && cp -r assets dist/assets"
+},
+  "dependencies": {
+    "@types/node": "^25.6.0",
+    "axios": "^1.0.0",
+    "dotenv": "^16.0.0",
+    "electron": "^36.0.0",
+    "electron-builder": "^26.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
 }

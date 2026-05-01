@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Darken</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="titlebar">
+    <div class="titlebar-left">
+      <div class="logo-dot"></div>
+      <span class="logo-text">DARKEN</span>
+      <span class="logo-sub">AI ASSISTANT SYSTEM</span>
+    </div>
+    <div class="titlebar-controls">
+      <button onclick="window.darken.minimize()">─</button>
+      <button onclick="window.darken.maximize()">□</button>
+      <button class="close" onclick="window.darken.close()">✕</button>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <div class="panel left-panel">
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">⚙</span>
+          <span>SYSTEM OVERVIEW</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">CPU Usage</span>
+          <span class="stat-value" id="cpu-val">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="cpu-bar"></div></div>
+
+        <div class="stat-row">
+          <span class="stat-label">RAM Usage</span>
+          <span class="stat-value" id="ram-val">0 GB / 0 GB</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="ram-bar"></div></div>
+
+        <div class="stat-row">
+          <span class="stat-label">Disk Usage</span>
+          <span class="stat-value" id="disk-val">0 / 0</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="disk-bar"></div></div>
+
+        <div class="gauge-row">
+          <div class="gauge">
+            <svg viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1a1a2e" stroke-width="8"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#7c3aed" stroke-width="8"
+                stroke-dasharray="201" stroke-dashoffset="201"
+                stroke-linecap="round" transform="rotate(-90 40 40)"
+                id="cpu-gauge"/>
+            </svg>
+            <div class="gauge-label"><span id="cpu-gauge-val">0%</span><small>CPU</small></div>
+          </div>
+          <div class="gauge">
+            <svg viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1a1a2e" stroke-width="8"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#7c3aed" stroke-width="8"
+                stroke-dasharray="201" stroke-dashoffset="201"
+                stroke-linecap="round" transform="rotate(-90 40 40)"
+                id="ram-gauge"/>
+            </svg>
+            <div class="gauge-label"><span id="ram-gauge-val">0%</span><small>RAM</small></div>
+          </div>
+          <div class="gauge">
+            <svg viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#1a1a2e" stroke-width="8"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#7c3aed" stroke-width="8"
+                stroke-dasharray="201" stroke-dashoffset="201"
+                stroke-linecap="round" transform="rotate(-90 40 40)"
+                id="disk-gauge"/>
+            </svg>
+            <div class="gauge-label"><span id="disk-gauge-val">0%</span><small>DISK</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">☁</span>
+          <span>WEATHER</span>
+        </div>
+        <div class="weather-main">
+          <span class="weather-icon" id="weather-icon">⛅</span>
+          <div>
+            <div class="weather-temp" id="weather-temp">--°C</div>
+            <div class="weather-city" id="weather-city">Loading...</div>
+            <div class="weather-desc" id="weather-desc">--</div>
+          </div>
+        </div>
+        <div class="weather-stats">
+          <div><small>Humidity</small><span id="weather-humidity">--%</span></div>
+          <div><small>Wind</small><span id="weather-wind">-- m/s</span></div>
+          <div><small>Feels Like</small><span id="weather-feels">--°C</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">◷</span>
+          <span>SYSTEM UPTIME</span>
+        </div>
+        <div class="uptime-display" id="uptime-display">00:00:00</div>
+        <div class="uptime-label">System Running For</div>
+        <div class="uptime-stats">
+          <div><small>Session</small><span>1</span></div>
+          <div><small>Commands</small><span id="cmd-count">0</span></div>
+          <div><small>Processes</small><span id="proc-count">--</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">✦</span>
+          <span>QUICK ACTIONS</span>
+        </div>
+        <div class="actions-grid">
+          <button class="action-btn" onclick="sendQuickCommand('open chrome')">
+            <span>⊞</span><small>Open App</small>
+          </button>
+          <button class="action-btn" onclick="sendQuickCommand('screenshot')">
+            <span>⊡</span><small>Screenshot</small>
+          </button>
+          <button class="action-btn" onclick="sendQuickCommand('screenshot')">
+            <span>⊙</span><small>Screenshots</small>
+          </button>
+          <button class="action-btn" onclick="sendQuickCommand('lock')">
+            <span>⏻</span><small>Power Options</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div class="status-avatar">D</div>
+        <span class="status-name">DARKEN</span>
+        <div class="status-indicator">
+          <div class="status-dot"></div>
+          <span>ONLINE</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="panel center-panel">
+      <div class="time-weather-bar">
+        <div class="time-block">
+          <span class="clock-icon">◷</span>
+          <div>
+            <div class="time-display" id="time-display">00:00 AM</div>
+            <div class="date-display" id="date-display">Loading...</div>
+          </div>
+        </div>
+        <div class="time-block">
+          <span class="clock-icon">⊹</span>
+          <div>
+            <div class="time-display" id="temp-top">--°C</div>
+            <div class="date-display" id="city-top">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dragon-zone">
+        <div class="voice-ring" id="voice-ring">
+          <div class="ring ring-outer"></div>
+          <div class="ring ring-inner"></div>
+          <div class="waveform" id="waveform">
+            <span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <img src="../../../assets/dragon.jpg" class="dragon-img" alt="Darken" />
+      </div>
+
+      <div class="listening-label" id="listening-label">⬡ Wake Me Up... ⬡</div>
+
+      <div class="center-controls">
+        <button class="ctrl-btn" onclick="sendQuickCommand('screenshot')">⊡</button>
+        <button class="ctrl-btn mic-btn" id="mic-btn" onclick="toggleListening()">🎤</button>
+        <button class="ctrl-btn" onclick="focusInput()">⌨</button>
+      </div>
+    </div>
+
+    <div class="panel right-panel">
+
+        <div class="card music-card">
+        <div class="card-header">
+            <span class="card-icon">♪</span>
+            <span>MUSIC PLAYER</span>
+        </div>
+        <div class="music-info">
+            <div class="music-thumb">♪</div>
+            <div class="music-meta">
+            <div class="music-title" id="music-title">No track playing</div>
+            <div class="music-artist" id="music-artist">--</div>
+            </div>
+        </div>
+        <div class="music-progress">
+            <span class="music-time" id="music-elapsed">0:00</span>
+            <div class="music-bar">
+            <div class="music-fill" id="music-fill"></div>
+            </div>
+            <span class="music-time" id="music-total">0:00</span>
+        </div>
+        <div class="music-controls">
+            <button class="music-btn" onclick="prevTrack()">⏮</button>
+            <button class="music-btn" onclick="togglePlay()">⏸</button>
+            <button class="music-btn" onclick="nextTrack()">⏭</button>
+        </div>
+        <div class="music-volume">
+            <span>🔊</span>
+            <input type="range" min="0" max="100" value="70" id="music-vol" oninput="setMusicVolume(this.value)"/>
+        </div>
+        </div>
+
+      <div class="card conversation-card">
+        <div class="card-header">
+          <span class="card-icon">💬</span>
+          <span>CONVERSATION</span>
+          <button class="clear-btn" onclick="clearChat()">🗑 Clear Chat</button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="message darken-msg">
+            <div class="msg-avatar">D</div>
+            <div class="msg-content">
+              <p>Hello, I am DARKEN.</p>
+              <p>How can I assist you today?</p>
+              <span class="msg-time" id="init-time"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input
+          type="text"
+          id="cmd-input"
+          class="cmd-input"
+          placeholder="Type a message..."
+          onkeydown="handleKey(event)"
+        />
+        <button class="send-btn" onclick="submitCommand()">➤</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
