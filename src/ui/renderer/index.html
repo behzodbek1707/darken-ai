@@ -190,34 +190,48 @@
     <div class="panel right-panel">
 
         <div class="card music-card">
-        <div class="card-header">
-            <span class="card-icon">♪</span>
-            <span>MUSIC PLAYER</span>
-        </div>
-        <div class="music-info">
-            <div class="music-thumb">♪</div>
-            <div class="music-meta">
-            <div class="music-title" id="music-title">No track playing</div>
-            <div class="music-artist" id="music-artist">--</div>
-            </div>
-        </div>
-        <div class="music-progress">
-            <span class="music-time" id="music-elapsed">0:00</span>
-            <div class="music-bar">
-            <div class="music-fill" id="music-fill"></div>
-            </div>
-            <span class="music-time" id="music-total">0:00</span>
-        </div>
-        <div class="music-controls">
-            <button class="music-btn" onclick="prevTrack()">⏮</button>
-            <button class="music-btn" onclick="togglePlay()">⏸</button>
-            <button class="music-btn" onclick="nextTrack()">⏭</button>
-        </div>
-        <div class="music-volume">
-            <span>🔊</span>
-            <input type="range" min="0" max="100" value="70" id="music-vol" oninput="setMusicVolume(this.value)"/>
-        </div>
-        </div>
+          <div class="card-header">
+              <span class="card-icon">♪</span>
+              <span>MUSIC PLAYER</span>
+          </div>
+
+          <!-- Centered thumb with visualizer -->
+          <div class="music-center">
+              <div class="music-thumb-wrapper" id="music-thumb-wrapper">
+                  <div class="visualizer-ring">
+                      <svg viewBox="0 0 120 120" id="viz-svg"></svg>
+                  </div>
+                  <div class="music-thumb">♪</div>
+              </div>
+              <div class="music-track-info">
+                  <div class="music-title" id="music-title">No track playing</div>
+                  <div class="music-artist" id="music-artist">--</div>
+              </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="music-progress">
+              <span class="music-time" id="music-elapsed">0:00</span>
+              <div class="music-bar">
+                  <div class="music-fill" id="music-fill"></div>
+              </div>
+              <span class="music-time" id="music-total">0:00</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="music-controls">
+              <button class="music-btn" onclick="prevTrack()">⏮</button>
+              <button class="music-btn play-btn" onclick="togglePlay()">▶</button>
+              <button class="music-btn" onclick="nextTrack()">⏭</button>
+              <button class="music-btn repeat-btn" id="repeat-btn" onclick="toggleRepeat()" title="Repeat one">🔂</button>
+          </div>
+
+          <!-- Volume -->
+          <div class="music-volume">
+              <span>🔊</span>
+              <input type="range" min="0" max="100" value="70" id="music-vol" oninput="setMusicVolume(this.value)"/>
+          </div>
+      </div>
 
       <div class="card conversation-card">
         <div class="card-header">

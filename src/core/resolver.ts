@@ -1,6 +1,7 @@
 export function resolveAction(input: string) {
     const words = input.toLowerCase().split(" ")
     const actions = ["open", "close", "restart", "mute", "screenshot", "volume", "brightness", "lock"]
+    const fillers = ["my", "the", "a", "an", "some", "this", "that", "please", "can", "you"]
 
     let action: string | null = null
     for (let w of words) {
@@ -12,7 +13,6 @@ export function resolveAction(input: string) {
 
     const noTargetActions = ["mute", "screenshot", "lock"]
     const actionIndex = words.findIndex(w => w === action)
-    const nextWord = words[actionIndex + 1] ?? null
 
     if (!action) return null
 
@@ -20,7 +20,9 @@ export function resolveAction(input: string) {
         return { action, target: "system" }
     }
 
-    const target = nextWord ?? words[words.length - 1]
+    const remaining = words.slice(actionIndex + 1).filter(w => !fillers.includes(w))
+    const target = remaining[0] ?? null
+
     if (!target) return null
 
     return { action, target }

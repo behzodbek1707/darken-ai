@@ -7,10 +7,27 @@ import { getActiveApps } from "../core/memory.js"
 import os from "os"
 import { exec } from "child_process"
 import "dotenv/config"
+import { recordAndTranscribe } from "../voice/listener.js"
+import { scanMusicLibrary, findTrack } from "../core/music-scanner.js"
+import { playTrack, stopTrack, togglePlayPause, getStatus, setVolume, setOnTrackEnd, toggleRepeat } from "../core/music-player.js"
+
+const musicLibrary = scanMusicLibrary()
+console.log(`⚫ Loaded ${musicLibrary.length} tracks`)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 let mainWindow: BrowserWindow | null = null
+
+setOnTrackEnd(() => {
+    const status = getStatus()
+    if (!status.track) return
+    const idx = musicLibrary.findIndex(t => t.id === status.track!.id)
+    const next = musicLibrary[(idx + 1) % musicLibrary.length]
+    playTrack(next)
+    if (mainWindow) {
+        mainWindow.webContents.send("track-changed", next)
+    }
+})
 
 function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize
@@ -47,6 +64,7 @@ app.on("window-all-closed", () => {
 })
 
 ipcMain.handle("send-command", async (_, input: string) => {
+    console.log("⚫ UI command received:", input)
     await routeCommand(input)
     return { ok: true }
 })
@@ -70,7 +88,6 @@ ipcMain.handle("get-system-stats", async () => {
     const freeMem = os.freemem()
     const usedMem = totalMem - freeMem
     const ramPercent = Math.round((usedMem / totalMem) * 100)
-
     const cpuPercent = await getCpuUsage()
     const diskStats = await getDiskUsage()
 
@@ -122,11 +139,76 @@ function getDiskUsage(): Promise<{ percent: number; used: string; total: string 
                 return
             }
             const [used, total, percentStr] = stdout.trim().split(" ")
-            resolve({
-                percent: parseInt(percentStr),
-                used,
-                total,
-            })
+            resolve({ percent: parseInt(percentStr), used, total })
         })
     })
 }
+
+ipcMain.handle("get-music-library", () => musicLibrary)
+
+ipcMain.handle("play-track", (_, trackId: string) => {
+    const track = musicLibrary.find(t => t.id === trackId)
+    if (!track) return { error: "Track not found" }
+    playTrack(track)
+    return { ok: true, track }
+})
+
+ipcMain.handle("search-and-play", (_, query: string) => {
+    const track = findTrack(query, musicLibrary)
+    if (!track) return { error: "No matching track found" }
+    playTrack(track)
+    return { ok: true, track }
+})
+
+ipcMain.handle("toggle-play", () => {
+    togglePlayPause()
+    return getStatus()
+})
+
+ipcMain.handle("stop-music", () => {
+    stopTrack()
+    return { ok: true }
+})
+
+ipcMain.handle("get-player-status", () => getStatus())
+
+ipcMain.handle("next-track", () => {
+    const status = getStatus()
+    if (!status.track) return
+    const idx = musicLibrary.findIndex(t => t.id === status.track!.id)
+    const next = musicLibrary[(idx + 1) % musicLibrary.length]
+    playTrack(next)
+    return { ok: true, track: next }
+})
+
+ipcMain.handle("prev-track", () => {
+    const status = getStatus()
+    if (!status.track) return
+    const idx = musicLibrary.findIndex(t => t.id === status.track!.id)
+    const prev = musicLibrary[(idx - 1 + musicLibrary.length) % musicLibrary.length]
+    playTrack(prev)
+    return { ok: true, track: prev }
+})
+
+ipcMain.handle("set-volume", (_, val: number) => {
+    setVolume(val)
+    return { ok: true }
+})
+
+ipcMain.handle("toggle-repeat", () => {
+    return toggleRepeat()
+})
+
+app.on("before-quit", () => {
+    stopTrack()
+})
+
+app.on("window-all-closed", () => {
+    stopTrack()
+    if (process.platform !== "darwin") app.quit()
+})
+
+ipcMain.handle("record-voice", async () => {
+    const text = await recordAndTranscribe(6)
+    return { text }
+})

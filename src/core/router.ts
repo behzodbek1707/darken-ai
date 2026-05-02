@@ -72,6 +72,11 @@ async function routeSingle(input: string): Promise<void> {
     }
 
     let result: Command | null = resolveAction(input)
+    const unknownTargets = ["browser", "editor", "terminal", "music", "player"]
+
+    if (result && unknownTargets.includes(result.target?.toLowerCase() || "")) {
+        result = null
+    }
 
     const context = resolveContext(input)
 
